@@ -48,23 +48,7 @@ func (d *DB) insertOrReplaceData(data interface{}, insertType string) (int64, er
 
 		// 解析tag，找出真实的sql字段名
 		tag := t.Field(i).Tag.Get("xianorm")
-		if tag != "" {
-			// 跳过自增字段
-			if strings.Contains(strings.ToLower(tag), "auto_increment") {
-				continue
-			} else {
-				// 获取真实的sql字段名
-				// 将标签值按逗号分割，取第一个部分作为真实的SQL字段名，并将其添加到fieldName切片中
-				fieldName = append(fieldName, strings.Split(tag, ",")[0])
-				// 在placeholder切片中添加一个问号 ?，用作占位符
-				placeHolder = append(placeHolder, "?")
-			}
-		} else {
-			// 若字段没有tag，则使用字段名作为sql字段名
-			fieldName = append(fieldName, t.Field(i).Name)
-			// 同理加个问号
-			placeHolder = append(placeHolder, "?")
-		}
+		parseFieldAndPlaceHolder(0, tag, &fieldName, &placeHolder, t, i)
 
 		// 保存字段的值
 		d.AllExec = append(d.AllExec, v.Field(i).Interface())
@@ -103,46 +87,29 @@ func (d *DB) batchInsertData(batchData interface{}, insertType string) (int64, e
 
 	// 循环处理每个子元素
 	for i := 0; i < l; i++ {
-		value := getValue.Index(i)
-		typed := value.Type()
-		if typed.Kind() != reflect.Struct {
+		v := getValue.Index(i)
+		t := v.Type()
+		if t.Kind() != reflect.Struct {
 			log.Fatal("批量插入的子元素必须是结构体类型")
 		}
 
-		num := value.NumField()
+		num := v.NumField()
 
 		// 当前子元素的占位符
 		var subPlaceHolder []string
 		// 循环遍历子元素的字段
 		for j := 0; j < num; j++ {
 			// 跳过小写开头的字段
-			if !value.Field(j).CanInterface() {
+			if !v.Field(j).CanInterface() {
 				continue
 			}
 
-			// 解析tag，找出真实的sql字段名
-			tag := typed.Field(j).Tag.Get("xianorm")
-			if tag != "" {
-				// 跳过自增字段
-				if strings.Contains(strings.ToLower(tag), "auto_increment") {
-					continue
-				} else {
-					// 字段名只记录第一个的
-					if i == 1 {
-						fieldName = append(fieldName, strings.Split(tag, ",")[0])
-					}
-					subPlaceHolder = append(subPlaceHolder, "?")
-				}
-			} else {
-				// 字段名只记录第一个的
-				if i == 1 {
-					fieldName = append(fieldName, typed.Field(j).Name)
-				}
-				subPlaceHolder = append(subPlaceHolder, "?")
-			}
+			// 解析tag，找出真实的sql字段名，并生成占位符
+			tag := t.Field(j).Tag.Get("xianorm")
+			parseFieldAndPlaceHolder(i, tag, &fieldName, &subPlaceHolder, t, j)
 
 			// 字段值
-			d.AllExec = append(d.AllExec, value.Field(j).Interface())
+			d.AllExec = append(d.AllExec, v.Field(j).Interface())
 		}
 
 		// 子元素拼接成多个()括号后的值
@@ -170,18 +137,23 @@ func (d *DB) batchInsertData(batchData interface{}, insertType string) (int64, e
 }
 
 // 解析tag，找出真实的sql字段名，并生成占位符
-func parseFieldAndPlaceHolder(i int, tag string, fieldName *[]string, subPlaceHolder *[]string, typed reflect.Type, j int) {
+func parseFieldAndPlaceHolder(i int, tag string, fieldName *[]string, subPlaceHolder *[]string, t reflect.Type, j int) {
 	// 字段名只记录第一个的
-	if i == 1 {
+	if i == 0 {
 		if tag != "" {
 			// 跳过自增字段
+
 			if !strings.Contains(strings.ToLower(tag), "auto_increment") {
+				// 获取真实的sql字段名
+				// 将标签值按逗号分割，取第一个部分作为真实的SQL字段名，并将其添加到
 				*fieldName = append(*fieldName, strings.Split(tag, ",")[0])
 			}
 		} else {
-			*fieldName = append(*fieldName, typed.Field(j).Name)
+			// 若字段没有tag，则使用字段名作为sql字段名
+			*fieldName = append(*fieldName, t.Field(j).Name)
 		}
 	}
+	// 在placeholder切片中添加一个问号 ?，用作占位符
 	*subPlaceHolder = append(*subPlaceHolder, "?")
 }
 
