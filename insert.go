@@ -1,6 +1,7 @@
 package xianorm
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"reflect"
@@ -10,23 +11,40 @@ import (
 
 // Insert 插入数据
 func (d *DB) Insert(data interface{}) (int64, error) {
-	return d.insertOrReplaceData(data, "insert")
+	//return d.insertOrReplaceData(data, "insert")
+	// 利用反射判断是批量还是单个插入
+	getValue := reflect.ValueOf(data).Kind()
+	if getValue == reflect.Struct {
+		return d.insertOrReplaceData(data, "insert")
+	} else if getValue == reflect.Slice || getValue == reflect.Array {
+		return d.batchInsertOrReplaceData(data, "insert")
+	} else {
+		return 0, errors.New("插入的数据格式不正确，单个插入格式为: struct，批量插入格式为: []struct")
+	}
 }
 
 // Replace 替换插入数据
 func (d *DB) Replace(data interface{}) (int64, error) {
-	return d.insertOrReplaceData(data, "replace")
+	// 利用反射判断是批量还是单个替换
+	getValue := reflect.ValueOf(data).Kind()
+	if getValue == reflect.Struct {
+		return d.insertOrReplaceData(data, "insert")
+	} else if getValue == reflect.Slice || getValue == reflect.Array {
+		return d.batchInsertOrReplaceData(data, "insert")
+	} else {
+		return 0, errors.New("插入的数据格式不正确，单个插入格式为: struct，批量插入格式为: []struct")
+	}
 }
 
-// BatchInsert 批量插入数据
-func (d *DB) BatchInsert(data interface{}) (int64, error) {
-	return d.batchInsertData(data, "insert")
-}
-
-// BatchReplace 批量替换插入数据
-func (d *DB) BatchReplace(data interface{}) (int64, error) {
-	return d.batchInsertData(data, "replace")
-}
+//// BatchInsert 批量插入数据
+//func (d *DB) BatchInsert(data interface{}) (int64, error) {
+//	return d.batchInsertData(data, "insert")
+//}
+//
+//// BatchReplace 批量替换插入数据
+//func (d *DB) BatchReplace(data interface{}) (int64, error) {
+//	return d.batchInsertData(data, "replace")
+//}
 
 // 插入或者替换数据的真正方法
 func (d *DB) insertOrReplaceData(data interface{}, insertType string) (int64, error) {
@@ -76,7 +94,7 @@ func (d *DB) insertOrReplaceData(data interface{}, insertType string) (int64, er
 }
 
 // 批量插入数据的真正方法
-func (d *DB) batchInsertData(batchData interface{}, insertType string) (int64, error) {
+func (d *DB) batchInsertOrReplaceData(batchData interface{}, insertType string) (int64, error) {
 	getValue := reflect.ValueOf(batchData)
 	l := getValue.Len()
 
