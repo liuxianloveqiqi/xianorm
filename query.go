@@ -162,12 +162,16 @@ func (d *DB) Find(result interface{}) error {
 			// 遍历结构体
 			for i := 0; i < destType.NumField(); i++ {
 				// 看下是否有sql别名
-				sqlTag := destType.Field(i).Tag.Get("sql")
+				tag := destType.Field(i).Tag.Get("xianorm")
 				var fieldName string
-				if sqlTag != "" {
-					fieldName = strings.Split(sqlTag, ",")[0]
+				// 如果标签不为空则跳过自增主键找的字段值
+				if tag != "" && !strings.Contains(strings.ToLower(tag), "auto_increment") {
+					fieldName = strings.Split(tag, ",")[0]
+
 				} else {
-					fieldName = destType.Field(i).Name
+					// 没有标签默认将结构体字段小写后取字段名
+					fieldName = strings.ToLower(destType.Field(i).Name)
+
 				}
 
 				// struct里没有这个key
@@ -187,68 +191,53 @@ func (d *DB) Find(result interface{}) error {
 
 	return nil
 }
-func (d *DB) reflectSet(dest reflect.Value, index int, value string) error {
-	// 获取指定索引位置的结构体字段
-	field := dest.Field(index)
 
+// reflectSet 反射赋值函数，根据字段类型将字符串值转换为相应的类型，并设置到结构体的字段中
+func (d *DB) reflectSet(dest reflect.Value, i int, value string) error {
 	// 获取字段的类型
-	fieldType := field.Type()
+	fieldKind := dest.Field(i).Kind()
 
-	// 检查字段是否为指针类型
-	if fieldType.Kind() == reflect.Ptr {
-		// 如果字段是指针类型，创建一个新的字段类型实例
-		newField := reflect.New(fieldType.Elem())
-
-		// 将字符串值转换为字段类型对应的实际类型
-		err := d.convertValue(newField.Elem(), value)
-		if err != nil {
-			return err
-		}
-
-		// 将指针字段设置为新实例
-		field.Set(newField)
-	} else {
-		// 如果字段不是指针类型，直接将字符串值转换为字段类型对应的实际类型
-		err := d.convertValue(field, value)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-func (d *DB) convertValue(field reflect.Value, value string) error {
-	switch field.Kind() {
+	// 根据字段类型进行转换和赋值
+	switch fieldKind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		// 将字符串值转换为int64类型
-		intVal, err := strconv.ParseInt(value, 10, 64)
+		res, err := strconv.ParseInt(value, 10, 64)
 		if err != nil {
-			return err
+			return d.setErrorInfo(err)
 		}
 		// 设置字段的值
-		field.SetInt(intVal)
-	case reflect.Float32, reflect.Float64:
-		// 将字符串值转换为float64类型
-		floatVal, err := strconv.ParseFloat(value, 64)
-		if err != nil {
-			return err
-		}
-		// 设置字段的值
-		field.SetFloat(floatVal)
-	case reflect.Bool:
-		// 将字符串值转换为bool类型
-		boolVal, err := strconv.ParseBool(value)
-		if err != nil {
-			return err
-		}
-		// 设置字段的值
-		field.SetBool(boolVal)
+		dest.Field(i).SetInt(res)
 	case reflect.String:
 		// 直接将字符串值设置为字段的值
-		field.SetString(value)
+		dest.Field(i).SetString(value)
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		// 将字符串值转换为uint64类型
+		res, err := strconv.ParseUint(value, 10, 64)
+		if err != nil {
+			return d.setErrorInfo(err)
+		}
+		// 设置字段的值
+		dest.Field(i).SetUint(res)
+	case reflect.Float32, reflect.Float64:
+		// 将字符串值转换为float32类型
+		res, err := strconv.ParseFloat(value, 64)
+		if err != nil {
+			return d.setErrorInfo(err)
+		}
+		// 设置字段的值
+		dest.Field(i).SetFloat(res)
+
+	case reflect.Bool:
+		// 将字符串值转换为bool类型
+		res, err := strconv.ParseBool(value)
+		if err != nil {
+			return d.setErrorInfo(err)
+		}
+		// 设置字段的值
+		dest.Field(i).SetBool(res)
 	default:
 		// 如果不支持的类型，则返回错误
-		return fmt.Errorf("不支持的字段类型：%v", field.Type().Name())
+		return fmt.Errorf("不支持的字段类型：%v", fieldKind.String())
 	}
 
 	return nil

@@ -25,5 +25,14 @@ func TestQuery(t *testing.T) {
 	fmt.Println(m)
 }
 func TestFind(t *testing.T) {
-
+	xdb, err := xianorm.NewDB("root", "root", "43.139.195.17:3301", "orm")
+	if err != nil {
+		log.Fatal(err)
+	}
+	p := make([]Penson, 0)
+	err = xdb.Table("person").Find(&p)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(p)
 }

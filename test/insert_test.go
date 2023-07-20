@@ -8,8 +8,8 @@ import (
 )
 
 type Penson struct {
-	ID   int `xianorm:auto_increment`
-	Name string
+	ID   int    `xianorm:"auto_increment,id""`
+	Name string `xianorm:"name""`
 	Age  int
 }
 
