@@ -33,9 +33,7 @@ func NewDB(Username string, Password string, Address string, Dbname string) (*DB
 	if err != nil {
 		return nil, err
 	}
-	//最大连接数等配置，先占个位
-	//db.SetMaxOpenConns(3)
-	//db.SetMaxIdleConns(3)
+
 	if err = db.Ping(); err != nil {
 		log.Fatal(err)
 	}
