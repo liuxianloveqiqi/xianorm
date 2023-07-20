@@ -242,3 +242,37 @@ func (d *DB) reflectSet(dest reflect.Value, i int, value string) error {
 
 	return nil
 }
+
+// First 查询单条记录，返回值为结构体切片
+func (d *DB) First(result interface{}) error {
+	// 检查传入的result是否是指针类型
+	if reflect.ValueOf(result).Kind() != reflect.Ptr {
+		return errors.New("参数必须是指针类型")
+	}
+	// 检查传入的result是否是结构体类型的指针
+	dest := reflect.Indirect(reflect.ValueOf(result))
+	if dest.Kind() != reflect.Struct {
+		return errors.New("参数必须是结构体类型的指针")
+	}
+	// 确保能够得到实际值的反射对象，而不是指针本身的反射对象
+	dest = reflect.Indirect(reflect.ValueOf(result))
+
+	// 创建一个与原始值类型相同的切片
+	// 调用Elem()得到实际的切片值而不是指向切片的指针。
+	destSlice := reflect.New(reflect.SliceOf(dest.Type())).Elem()
+
+	// 调用Find函数查询单条记录
+	// 这里传地址用Addr()
+	if err := d.Limit(1).Find(destSlice.Addr().Interface()); err != nil {
+		return err
+	}
+
+	// 判断返回的切片长度，如果为空，返回错误
+	if destSlice.Len() == 0 {
+		return d.setErrorInfo(errors.New("查询为空"))
+	}
+
+	// 将切片中的第一个元素复制给原始值的结构体指针
+	dest.Set(destSlice.Index(0))
+	return nil
+}

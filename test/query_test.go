@@ -36,3 +36,15 @@ func TestFind(t *testing.T) {
 	}
 	fmt.Println(p)
 }
+func TestFirst(t *testing.T) {
+	xdb, err := xianorm.NewDB("root", "root", "43.139.195.17:3301", "orm")
+	if err != nil {
+		log.Fatal(err)
+	}
+	p := Penson{}
+	err = xdb.Table("person").First(&p)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(p)
+}
