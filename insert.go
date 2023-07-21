@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"reflect"
-	"runtime"
 	"strings"
 )
 
@@ -173,12 +172,4 @@ func parseFieldAndPlaceHolder(i int, tag string, fieldName *[]string, subPlaceHo
 	}
 	// 在placeholder切片中添加一个问号 ?，用作占位符
 	*subPlaceHolder = append(*subPlaceHolder, "?")
-}
-
-// 自定义错误格式
-func (d *DB) setErrorInfo(err error) error {
-	// 用于获取当前调用栈的信息
-	_, file, line, _ := runtime.Caller(1)
-	// 返回文件名和行号和错误信息
-	return fmt.Errorf("file: %s:%d, %w", file, line, err)
 }

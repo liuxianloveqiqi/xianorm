@@ -12,22 +12,7 @@ import (
 
 func (d *DB) Query() ([]map[string]string, error) {
 	// 拼接SQL语句
-	d.Sql = "select " + d.FieldParam + " from " + d.GetTable()
-
-	// 如果WhereParam或OrWhereParam不为空，添加查询条件
-	if d.WhereParam != "" || d.OrWhereParam != "" {
-		d.Sql += " where " + d.WhereParam + d.OrWhereParam
-	}
-
-	// 如果 OrderParam 不为空，添加排序条件
-	if d.OrderParam != "" {
-		d.Sql += " order by " + d.OrderParam
-	}
-
-	// 如果 LimitParam 不为空，添加限制条件
-	if d.LimitParam != "" {
-		d.Sql += " limit " + d.LimitParam
-	}
+	d.BuildQuerySql()
 	// 执行查询
 	rows, err := d.Db.Query(d.Sql, d.WhereExec...)
 	if err != nil {

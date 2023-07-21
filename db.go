@@ -24,6 +24,7 @@ type DB struct {
 	Tx           *sql.Tx
 	GroupParam   string
 	HavingParam  string
+	HavingExec   []interface{}
 }
 
 // NewDB 新建Mysql连接

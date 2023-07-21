@@ -143,3 +143,19 @@ func (d *DB) Group(group ...string) *DB {
 	}
 	return d
 }
+
+// Having Having过滤，跟where的实现一样
+func (d *DB) Having(having string, args ...interface{}) *DB {
+	// 创建一个新的DB结构体，复制原有的字段和值
+
+	// 初始化HavingExec切片
+	if d.HavingExec == nil {
+		d.HavingExec = []interface{}{}
+	}
+
+	// 添加新的过滤条件和参数
+	d.HavingParam += having + " "
+	d.HavingExec = append(d.HavingExec, args...)
+
+	return d
+}
