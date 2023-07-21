@@ -5,7 +5,7 @@ import (
 	"runtime"
 )
 
-func (d *DB) BuildQuerySql() string {
+func (d *DB) BuildQuerySql() {
 	// 拼接SQL语句
 	d.Sql = "SELECT " + d.FieldParam + " FROM " + d.GetTable()
 
@@ -34,7 +34,6 @@ func (d *DB) BuildQuerySql() string {
 		d.Sql += " LIMIT " + d.LimitParam
 	}
 
-	return d.Sql
 }
 
 // 自定义错误格式

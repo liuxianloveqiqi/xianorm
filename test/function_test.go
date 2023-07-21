@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"log"
 	"testing"
 	"xianorm"
 )
@@ -52,10 +53,14 @@ func TestOrder(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
+	p := make([]Penson, 0)
 	// 测试Order函数
-	xdb.Order("name", "asc", "age", "desc")
+	err = xdb.Table("person").Order("id", "desc", "age", "desc").Find(&p)
+	if err != nil {
+		log.Fatal(err)
+	}
 	fmt.Println("Order Param:", xdb.OrderParam)
+	fmt.Println("perons：", p)
 }
 
 func TestGroup(t *testing.T) {
@@ -63,10 +68,12 @@ func TestGroup(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
+	p := make([]Penson, 0)
 	// 测试Group函数
-	xdb.Group("name", "age")
+	xdb.Table("person").Group("name").Find(&p)
 	fmt.Println("Group Param:", xdb.GroupParam)
+	fmt.Println("perons：", p)
+
 }
 
 func TestHaving(t *testing.T) {

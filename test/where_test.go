@@ -1,7 +1,6 @@
 package test
 
 import (
-	"fmt"
 	"testing"
 	"xianorm"
 )
@@ -25,6 +24,4 @@ func TestWhereAndSelect(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// 打印查询结果
-	fmt.Println("Query Results:", results)
 }

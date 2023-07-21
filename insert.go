@@ -135,7 +135,7 @@ func (d *DB) batchInsertOrReplaceData(batchData interface{}, insertType string) 
 
 	// 拼接表名、字段名和占位符，生成最终的批量插入SQL语句
 	d.Prepare = fmt.Sprintf("%s into %s (%s) values %s", insertType, d.GetTable(), strings.Join(fieldName, ","), strings.Join(placeHolder, ","))
-
+	fmt.Println(d.Prepare)
 	// Prepare语句，准备好一个预处理语句
 	stmt, err := d.Db.Prepare(d.Prepare)
 	if err != nil {
@@ -159,11 +159,12 @@ func parseFieldAndPlaceHolder(i int, tag string, fieldName *[]string, subPlaceHo
 	if i == 0 {
 		if tag != "" {
 			// 跳过自增字段
-
+			fmt.Println(tag)
 			if !strings.Contains(strings.ToLower(tag), "auto_increment") {
 				// 获取真实的sql字段名
 				// 将标签值按逗号分割，取第一个部分作为真实的SQL字段名，并将其添加到
 				*fieldName = append(*fieldName, strings.Split(tag, ",")[0])
+
 			}
 		} else {
 			// 若字段没有tag，则使用字段名作为sql字段名
