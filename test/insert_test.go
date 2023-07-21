@@ -8,9 +8,10 @@ import (
 )
 
 type Penson struct {
-	ID   int    `xianorm:"id"`
-	Name string `xianorm:"name"`
-	Age  int
+	ID     int    `xianorm:"id"`
+	Name   string `xianorm:"name"`
+	Age    int
+	Gender int
 }
 
 func TestInsert(t *testing.T) {
