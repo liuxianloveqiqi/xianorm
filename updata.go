@@ -1,6 +1,7 @@
 package xianorm
 
 import (
+	"database/sql"
 	"errors"
 	"reflect"
 	"strings"
@@ -75,10 +76,14 @@ func (d *DB) executeUpdate() (int64, error) {
 		d.Prepare += " limit " + d.LimitParam
 	}
 
-	// Prepare语句，准备好一个预处理语句
-	stmt, err := d.Db.Prepare(d.Prepare)
-	if err != nil {
-		return 0, d.setErrorInfo(err)
+	// 判断是否是事务
+	var stmt *sql.Stmt
+	var err error
+	// 准备SQL语句，返回一个预处理语句
+	if d.TransStatus == 1 {
+		stmt, err = d.Tx.Prepare(d.Prepare)
+	} else {
+		stmt, err = d.Db.Prepare(d.Prepare)
 	}
 	defer stmt.Close()
 

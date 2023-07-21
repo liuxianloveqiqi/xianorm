@@ -69,8 +69,9 @@ func TestGroup(t *testing.T) {
 		t.Fatal(err)
 	}
 	p := make([]Penson, 0)
+
 	// 测试Group函数
-	xdb.Table("person").Group("name").Find(&p)
+	xdb.Table("person").Select("COUNT(*)").Group("gender").Find(&p)
 	fmt.Println("Group Param:", xdb.GroupParam)
 	fmt.Println("perons：", p)
 
