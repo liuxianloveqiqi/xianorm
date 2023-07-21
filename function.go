@@ -3,6 +3,7 @@ package xianorm
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 // Limit 用于设置查询的 LIMIT 条件
@@ -23,7 +24,7 @@ func (d *DB) Limit(limit ...int) *DB {
 	return d
 }
 
-// aggregateQuery 聚合查询函数，根据传入的聚合函数名称和参数进行查询
+// aggregateQuery 聚合查询函数，根据传入的聚合函数名称和参数进行对应的操作
 func (d *DB) aggregateQuery(functionName, param string) (interface{}, error) {
 	// 拼接SQL语句，使用传入的聚合函数和参数
 	d.Prepare = fmt.Sprintf("SELECT %s(%s) AS result FROM %s", functionName, param, d.GetTable())
@@ -98,4 +99,47 @@ func (d *DB) Sum(param string) (string, error) {
 		return "0", d.setErrorInfo(err)
 	}
 	return string(sum.([]byte)), nil
+}
+
+// Order 排序
+func (d *DB) Order(order ...string) *DB {
+	orderLen := len(order)
+	if orderLen%2 != 0 {
+		panic("order by参数错误，请保证参数个数为偶数个")
+	}
+
+	// 排序的个数
+	orderNum := orderLen / 2
+
+	// 多次调用的情况下，如果已经有排序参数则在末尾添加逗号
+	if d.OrderParam != "" {
+		d.OrderParam += ","
+	}
+
+	// 用于存储拼接后的排序参数列表
+	var orderParams []string
+
+	// 循环处理每个排序字段和排序方式
+	for i := 0; i < orderNum; i++ {
+		keyString := strings.ToLower(order[i*2+1])
+		if keyString != "desc" && keyString != "asc" {
+			panic("排序关键字只能为：desc和asc")
+		}
+
+		// 将排序字段和排序方式拼接成一个字符串，并添加到列表中
+		orderParams = append(orderParams, order[i*2]+" "+order[i*2+1])
+	}
+
+	// 将排序参数列表连接成一个字符串，以逗号分隔
+	d.OrderParam += strings.Join(orderParams, ",")
+
+	return d
+}
+
+// Group group分组
+func (d *DB) Group(group ...string) *DB {
+	if len(group) != 0 {
+		d.GroupParam = strings.Join(group, ",")
+	}
+	return d
 }
