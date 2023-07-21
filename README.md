@@ -24,5 +24,5 @@
 
 ## 许可证
 
-**xianorm** 在 MIT 许可证下开源,允许用户在遵循 [MIT 开源证书](https://github.com/MashiroC/begonia/blob/master/LICENSE) 规则的前提下使用
+**xianorm** 在 **MIT** 许可证下开源,允许用户在遵循 [MIT 开源证书](https://github.com/MashiroC/begonia/blob/master/LICENSE) 规则的前提下使用
 
