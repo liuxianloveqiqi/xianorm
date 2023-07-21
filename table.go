@@ -22,8 +22,6 @@ func (d *DB) resetDB() {
 	d.UpdateParam = ""
 	d.UpdateExec = []interface{}{}
 	d.FieldParam = "*"
-	d.TransStatus = 0
-	d.Tx = nil
 	d.GroupParam = ""
 	d.HavingParam = ""
 }

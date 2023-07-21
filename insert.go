@@ -76,11 +76,17 @@ func (d *DB) insertOrReplaceData(data interface{}, insertType string) (int64, er
 	//d.Prepare = insertType + " into " + d.GetTable() + " (" + strings.Join(fieldName, ",") + ") values(" + strings.Join(placeHolder, ",") + ")"
 	d.Prepare = fmt.Sprintf("%s into %s (%s) values (%s)", insertType, d.GetTable(), strings.Join(fieldName, ","), strings.Join(placeHolder, ","))
 
-	// Prepare语句，准备好一个预处理语句
-	stmt, err := d.Db.Prepare(d.Prepare)
-	if err != nil {
-		return 0, d.setErrorInfo(err)
+	// 判断是否是事务
+	var stmt *sql.Stmt
+	var err error
+	fmt.Println("iii", d.TransStatus)
+	// 准备SQL语句，返回一个预处理语句
+	if d.TransStatus == 1 {
+		stmt, err = d.Tx.Prepare(d.Prepare)
+	} else {
+		stmt, err = d.Db.Prepare(d.Prepare)
 	}
+	defer stmt.Close()
 
 	// 来执行预处理语句
 	result, err := stmt.Exec(d.AllExec...)

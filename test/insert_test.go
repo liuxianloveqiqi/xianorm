@@ -19,8 +19,8 @@ func TestInsert(t *testing.T) {
 		log.Fatal(err)
 	}
 	p := Penson{
-		ID:   48,
-		Name: "hhh",
+		ID:   99,
+		Name: "jjj",
 		Age:  56,
 	}
 	_, err = xdb.Table("person").Insert(p)
