@@ -7,7 +7,7 @@ import (
 
 func TestWhereAndSelect(t *testing.T) {
 	// 创建数据库连接
-	xdb, err := xianorm.NewDB("root", "root", "43.139.195.17:3301", "orm")
+	xdb, err := xianorm.NewDB("root", "root", "localhost:3306", "orm")
 	if err != nil {
 		t.Fatal(err)
 	}

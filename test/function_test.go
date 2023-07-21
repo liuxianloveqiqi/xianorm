@@ -8,7 +8,7 @@ import (
 )
 
 func TestAggregateFunctions(t *testing.T) {
-	xdb, err := xianorm.NewDB("root", "root", "43.139.195.17:3301", "orm")
+	xdb, err := xianorm.NewDB("root", "root", "localhost:3306", "orm")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -49,7 +49,7 @@ func TestAggregateFunctions(t *testing.T) {
 	fmt.Println("Sum of Ages:", sum)
 }
 func TestOrder(t *testing.T) {
-	xdb, err := xianorm.NewDB("root", "root", "43.139.195.17:3301", "orm")
+	xdb, err := xianorm.NewDB("root", "root", "localhost:3306", "orm")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -64,7 +64,7 @@ func TestOrder(t *testing.T) {
 }
 
 func TestGroup(t *testing.T) {
-	xdb, err := xianorm.NewDB("root", "root", "43.139.195.17:3301", "orm")
+	xdb, err := xianorm.NewDB("root", "root", "localhost:3306", "orm")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -78,7 +78,7 @@ func TestGroup(t *testing.T) {
 }
 
 func TestHaving(t *testing.T) {
-	xdb, err := xianorm.NewDB("root", "root", "43.139.195.17:3301", "orm")
+	xdb, err := xianorm.NewDB("root", "root", "localhost:3306", "orm")
 	if err != nil {
 		t.Fatal(err)
 	}

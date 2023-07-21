@@ -8,7 +8,7 @@ import (
 
 func TestTransaction(t *testing.T) {
 
-	xdb, err := xianorm.NewDB("root", "root", "43.139.195.17:3301", "orm")
+	xdb, err := xianorm.NewDB("root", "root", "localhost:3306", "orm")
 	if err != nil {
 		log.Fatal(err)
 	}
