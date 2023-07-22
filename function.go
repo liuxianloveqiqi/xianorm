@@ -7,7 +7,7 @@ import (
 )
 
 // Limit 用于设置查询的 LIMIT 条件
-// 参数limit可以接收一个或两个int64类型的参数：
+// 参数limit可以接收一个或两个int类型的参数：
 
 func (d *DB) Limit(limit ...int) *DB {
 	if len(limit) == 1 {
