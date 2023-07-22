@@ -18,13 +18,13 @@ type DB struct {
 	LimitParam  string        // LIMIT 条件
 	OrderParam  string        // ORDER BY 条件
 	UpdateParam string        // UPDATE 条件
-	UpdateExec  []interface{} // 存储UPDATE 条件中的参数值
+	UpdateExec  []interface{} // 存储 UPDATE 条件中的参数值
 	FieldParam  string        // SELECT 字段
 	TransStatus int           // 事务状态，0表示无事务，1表示有事务
 	Tx          *sql.Tx       // 事务对象
 	GroupParam  string        // GROUP BY 条件
 	HavingParam string        // HAVING 条件
-	HavingExec  []interface{} // 存储HAVING 条件中的参数值
+	HavingExec  []interface{} // 存储 HAVING 条件中的参数值
 }
 
 // NewDB 新建Mysql连接
