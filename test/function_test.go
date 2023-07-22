@@ -68,13 +68,18 @@ func TestGroup(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	p := make([]Penson, 0)
 
 	// 测试Group函数
-	xdb.Table("person").Select("COUNT(*)").Group("gender").Find(&p)
-	fmt.Println("Group Param:", xdb.GroupParam)
-	fmt.Println("perons：", p)
+	maps, err := xdb.Table("person").
+		Select("CASE WHEN gender = 0 THEN '男' WHEN gender = 1 THEN '女' ELSE '未知' END as 'gender', COUNT(*) as 'count'").
+		Group("gender").
+		Query()
 
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fmt.Println("person的gender :", maps)
 }
 
 func TestHaving(t *testing.T) {
