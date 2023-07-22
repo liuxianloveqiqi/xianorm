@@ -10,8 +10,8 @@ func (d *DB) BuildQuerySql() {
 	d.Sql = "SELECT " + d.FieldParam + " FROM " + d.GetTable()
 
 	// 如果 WhereParam 或 OrWhereParam 不为空，添加查询条件
-	if d.WhereParam != "" || d.OrWhereParam != "" {
-		d.Sql += " WHERE " + d.WhereParam + d.OrWhereParam
+	if d.WhereParam != "" {
+		d.Sql += " WHERE " + d.WhereParam
 	}
 
 	// 如果 GroupParam 不为空，添加 GROUP BY 条件

@@ -30,8 +30,8 @@ func (d *DB) aggregateQuery(functionName, param string) (interface{}, error) {
 	d.Prepare = fmt.Sprintf("SELECT %s(%s) AS result FROM %s", functionName, param, d.GetTable())
 
 	// 如果WhereParam或OrWhereParam不为空，添加查询条件
-	if d.WhereParam != "" || d.OrWhereParam != "" {
-		d.Prepare += " WHERE " + d.WhereParam + d.OrWhereParam
+	if d.WhereParam != "" {
+		d.Prepare += " WHERE " + d.WhereParam
 	}
 
 	// 如果LimitParam不为空，添加限制条件

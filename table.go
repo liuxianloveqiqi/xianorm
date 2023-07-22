@@ -17,7 +17,6 @@ func (d *DB) resetDB() {
 	d.WhereParam = ""
 	d.LimitParam = ""
 	d.OrderParam = ""
-	d.OrWhereParam = ""
 	d.WhereExec = []interface{}{}
 	d.UpdateParam = ""
 	d.UpdateExec = []interface{}{}

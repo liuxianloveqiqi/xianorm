@@ -67,8 +67,8 @@ func (d *DB) executeUpdate() (int64, error) {
 	d.Prepare = "update " + d.GetTable() + " set " + d.UpdateParam
 
 	// 如果WhereParam不为空，添加查询条件
-	if d.WhereParam != "" || d.OrWhereParam != "" {
-		d.Prepare += " where " + d.WhereParam + d.OrWhereParam
+	if d.WhereParam != "" {
+		d.Prepare += " where " + d.WhereParam
 	}
 
 	// 如果LimitParam不为空，添加限制条件
